@@ -44,7 +44,7 @@ API REST robusta desenvolvida em Java com Spring Boot. Focada em segurança (JWT
    ```
 
 3. **Configuração de E-mail:**
-   Para testar o envio de e-mails, adicione suas credenciais no `application.properties`:
+   **Importante:** Para usar e testar as funcionalidades de envio de e-mails, o usuário deve editar o arquivo `src/main/resources/application.properties` e adicionar o e-mail e a senha de app do Google.
    ```properties
    spring.mail.host=smtp.gmail.com
    spring.mail.port=587
