@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder; 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +16,7 @@ import br.com.auth.auth_api.model.user.LoginResponseDTO;
 import br.com.auth.auth_api.model.user.RegisterDTO;
 import br.com.auth.auth_api.model.user.User;
 import br.com.auth.auth_api.repositories.UserRepository;
+import br.com.auth.auth_api.services.EmailService;
 import jakarta.validation.Valid;
 
 @RestController
@@ -24,13 +25,15 @@ public class AuthenticationController {
 
     @Autowired
     private AuthenticationManager authenticationManager;
-    
+
     @Autowired
     private UserRepository repository;
 
     @Autowired
-    private TokenService tokenService; 
+    private TokenService tokenService;
 
+    @Autowired
+    private EmailService emailService; 
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data){
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.login(), data.password());
@@ -47,8 +50,13 @@ public class AuthenticationController {
 
         String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
         User newUser = new User(data.login(), encryptedPassword, data.role());
-
         this.repository.save(newUser);
+
+        emailService.sendEmail(
+            data.login(), 
+            "Bem-vindo ao Sistema!", 
+            "Olá! Seu cadastro foi realizado com sucesso. Aproveite nossa API." 
+        );
 
         return ResponseEntity.ok().build();
     }
